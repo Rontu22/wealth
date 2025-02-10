@@ -112,3 +112,31 @@ export async function getUserAccounts() {
     throw new Error("Error in getting user accounts ");
   }
 }
+
+export async function getDashboardData() {
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+      where: {
+        clerkUserId: userId,
+      },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // get all user transactions
+    const transactions = await db.transaction.findMany({
+      where: {
+        userId: user.id,
+      },
+      orderBy: { date: "desc" },
+    });
+
+    return transactions.map(serializeTransaction);
+  } catch (error) {
+    throw new Error("Error in getting dashboard data ", error);
+  }
+}
