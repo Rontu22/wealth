@@ -109,6 +109,7 @@ export async function getUserAccounts() {
     );
     return serializedAccount;
   } catch (error) {
+    return [];
     throw new Error("Error in getting user accounts ");
   }
 }

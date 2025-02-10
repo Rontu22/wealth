@@ -5,31 +5,31 @@ import AddTransactionForm from "../_components/transaction-form";
 import { getTransaction } from "@/actions/transaction";
 
 const AddTransactionPage = async ({ searchParams }) => {
-  const accounts = await getUserAccounts();
+  try {
+    const accounts = await getUserAccounts();
+    let initialData = null;
 
-  const editId = searchParams?.edit;
+    if (searchParams?.edit) {
+      initialData = await getTransaction(searchParams.edit);
+    }
 
-  let initialData = null;
-  if (editId) {
-    const transaction = await getTransaction(editId);
-    initialData = transaction;
+    return (
+      <div className="max-w-3xl max-auto px-5">
+        <h1 className="text-5xl gradient-title mb-8">
+          {searchParams?.edit ? `Edit Transaction` : `Add Transaction`}
+        </h1>
+        <AddTransactionForm
+          accounts={accounts}
+          categories={defaultCategories}
+          editMode={!!searchParams?.edit}
+          initialData={initialData}
+        />
+      </div>
+    );
+  } catch (error) {
+    console.error("Error loading transaction page:", error);
+    return <div>Error loading transaction form. Please try again later.</div>;
   }
-
-  console.log("Edit id", editId);
-
-  return (
-    <div className="max-w-3xl max-auto px-5">
-      <h1 className="text-5xl gradient-title mb-8">
-        {editId ? `Edit Tranasaction` : `Add Transaction`}
-      </h1>
-      <AddTransactionForm
-        accounts={accounts}
-        categories={defaultCategories}
-        editMode={!!editId}
-        initialData={initialData}
-      />
-    </div>
-  );
 };
 
 export default AddTransactionPage;
